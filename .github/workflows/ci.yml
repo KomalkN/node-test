@@ -8,7 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-      
+
     steps:                                          
       - name: Checkout code #checkout repository     #STEP 1
         uses: actions/checkout@v2
