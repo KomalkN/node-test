@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node.js                          #STEP 2
         uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version: '20'
 
       - name: Install Dependencies                  #STEP 3
         run: npm install
