@@ -47,7 +47,7 @@ jobs:
           key: ${{ secrets.GCP_VM_PRIVATE_KEY }}
           script: |
             cd /var/www/html/node-test
-            sudo pm2 -f start index.js
+            sudo pm2 start index.js
         
 
 
