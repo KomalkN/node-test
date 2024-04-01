@@ -37,7 +37,16 @@ jobs:
           username: ${{ secrets.GCP_VM_USERNAME }}
           key: ${{ secrets.GCP_VM_PRIVATE_KEY }}
           script: |
-            sudo systemctl restart nginx             # To run this command in CGP You need to have nginx installed in GCP 
+            sudo systemctl restart nginx    # To run this command in CGP You need to have nginx installed in GCP 
+      - name: starting Listening on 3000
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.GCP_VM_HOST }}
+          username: ${{ secrets.GCP_VM_USERNAME }}
+          key: ${{ secrets.GCP_VM_PRIVATE_KEY }}
+          script: |
+            cd /var/www/html/node-test
+            sudo pm2 stop index.js
             
       - name: starting Listening on 3000
         uses: appleboy/ssh-action@master
