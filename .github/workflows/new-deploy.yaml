@@ -1,0 +1,87 @@
+name: Build and Deploy to ECS
+
+on:
+  push:
+    branches:
+      - feature/ecs-Setu
+
+env:
+  CLUSTER_NAME: node-app-cluster
+  # DOCKER_FILE: docker/server.Dockerfile
+  SERVICE_NAME: node-app-service
+  TASK_DEFINITION_NAME: node-app-task
+  CONTAINER_NAME: node-app-container
+
+jobs:
+  build-and-push-to-ecr:
+    name: Build and Push to ECR
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # Log in to Amazon ECR
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # Build and push the Docker image
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          # file: ${{ env.DOCKER_FILE }}
+          push: true
+          tags: |
+            ${{ secrets.ECR_REPOSITORY_URI }}:latest
+
+  deploy-to-ecs:
+    name: Deploy to ECS
+    runs-on: ubuntu-latest
+    needs: build-and-push-to-ecr
+
+    steps:
+      # Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # Download the latest task definition
+      - name: Download task definition
+        id: download-task
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition ${{ env.TASK_DEFINITION_NAME }} \
+            --query taskDefinition \
+            --output json > task-definition.json
+          echo "task-definition=task-definition.json" >> $GITHUB_OUTPUT
+
+      # Update the task definition with the new image
+      - name: Update task definition
+        id: update-task
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ secrets.ECR_REPOSITORY_URI }}:latest-${{ github.sha }}
+
+      # Deploy the updated task definition to ECS
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.update-task.outputs.task-definition }}
+          service: ${{ env.SERVICE_NAME }}
+          cluster: ${{ env.CLUSTER_NAME }}
+          wait-for-service-stability: true
