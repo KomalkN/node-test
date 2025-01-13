@@ -54,5 +54,5 @@ jobs:
         run: |
           aws ecs update-service \
             --cluster node-app-cluster \
-            --service node-app-service \
+            --service node-app-lb-service \
             --force-new-deployment

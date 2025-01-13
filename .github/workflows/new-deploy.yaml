@@ -8,7 +8,7 @@ on:
 env:
   CLUSTER_NAME: node-app-cluster
   # DOCKER_FILE: docker/server.Dockerfile
-  SERVICE_NAME: node-app-service
+  SERVICE_NAME: node-app-lb-service
   TASK_DEFINITION_NAME: node-app-task
   CONTAINER_NAME: node-app-container
 
