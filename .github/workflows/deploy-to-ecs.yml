@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - feature/ecs-Setup
+      - feature/ecs-Setu
 
 jobs:
   build-and-push-to-ecr:

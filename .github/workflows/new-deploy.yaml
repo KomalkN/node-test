@@ -3,12 +3,12 @@ name: Build and Deploy to ECS
 on:
   push:
     branches:
-      - feature/ecs-Setu
+      - feature/ecs-Setup
 
 env:
   CLUSTER_NAME: node-app-cluster
   # DOCKER_FILE: docker/server.Dockerfile
-  SERVICE_NAME: node-app-lb-service
+  SERVICE_NAME: node-app-service
   TASK_DEFINITION_NAME: node-app-task
   CONTAINER_NAME: node-app-container
 
