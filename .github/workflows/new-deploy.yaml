@@ -75,7 +75,7 @@ jobs:
         with:
           task-definition: task-definition.json
           container-name: ${{ env.CONTAINER_NAME }}
-          image: ${{ secrets.ECR_REPOSITORY_URI }}:latest-${{ github.sha }}
+          image: ${{ secrets.ECR_REPOSITORY_URI }}:latest
 
       # Deploy the updated task definition to ECS
       - name: Deploy to ECS
