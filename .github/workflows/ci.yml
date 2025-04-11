@@ -13,31 +13,31 @@ jobs:
       - name: Checkout code #checkout repository     #STEP 1
         uses: actions/checkout@v2
 
-      - name: Setup Node.js                          #STEP 2
-        uses: actions/setup-node@v3
-        with:
-          node-version: '14'
+      # - name: Setup Node.js                          #STEP 2
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     node-version: '14'
 
-      - name: Install Dependencies                  #STEP 3
-        run: npm install
+      # - name: Install Dependencies                  #STEP 3
+      #   run: npm install
           
-      - name: Copy code to GCP VM 
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.GCP_VM_HOST }}
-          username: ${{ secrets.GCP_VM_USERNAME }}
-          key: ${{ secrets.GCP_VM_PRIVATE_KEY }}
-          source: "."  
-          target: "/var/www/html/node-test"    # Target directory on GCP VM
+      # - name: Copy code to GCP VM 
+      #   uses: appleboy/scp-action@master
+      #   with:
+      #     host: ${{ secrets.GCP_VM_HOST }}
+      #     username: ${{ secrets.GCP_VM_USERNAME }}
+      #     key: ${{ secrets.GCP_VM_PRIVATE_KEY }}
+      #     source: "."  
+      #     target: "/var/www/html/node-test"    # Target directory on GCP VM
              
-      - name: starting Listening on 3000
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.GCP_VM_HOST }}
-          username: ${{ secrets.GCP_VM_USERNAME }}
-          key: ${{ secrets.GCP_VM_PRIVATE_KEY }} 
-          script: |
-            cd /var/www/html/node-test
-            sudo pm2 restart all 
+      # - name: starting Listening on 3000
+      #   uses: appleboy/ssh-action@master
+      #   with:
+      #     host: ${{ secrets.GCP_VM_HOST }}
+      #     username: ${{ secrets.GCP_VM_USERNAME }}
+      #     key: ${{ secrets.GCP_VM_PRIVATE_KEY }} 
+      #     script: |
+      #       cd /var/www/html/node-test
+      #       sudo pm2 restart all 
 
             
