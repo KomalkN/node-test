@@ -16,15 +16,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Get recent commit messages
+      - name: Validate Jira key in latest commit
         run: |
-          echo "Checking for Jira issue key in commit messages..."
-          COMMITS=$(git log -1 --pretty=%B)
-          echo "$COMMITS"
-          # Regex to match Jira keys
-          if echo "$COMMITS" | grep -E "[A-Za-z]{2,10}-[0-9]+"; then
+          echo "🔍 Checking for Jira issue key in the latest commit message..."
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "Commit message: $COMMIT_MSG"
+
+          # Regex pattern for Jira issue key
+          if echo "$COMMIT_MSG" | grep -Eq "[A-Z]{2,10}-[0-9]+"; then
             echo "Jira key found in commit message."
           else
-            echo "Commit message does not contain a valid Jira key"
+            echo "Commit message does not contain a valid Jira key."
             exit 1
           fi
