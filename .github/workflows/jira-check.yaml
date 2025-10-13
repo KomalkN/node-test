@@ -19,12 +19,11 @@ jobs:
      # Test Jira Key
       - name: Get recent commit messages
         run: |
-          echo "🔍 Checking for Jira issue key in commit messages..."
+          echo "Checking for Jira issue key in commit messages..."
           COMMITS=$(git log -1 --pretty=%B)
           echo "$COMMITS"
-
           # Regex to match Jira keys
-          if echo "$COMMITS" | grep -E -q "DP-[0-9]+"; then
+          if echo "$COMMITS" | grep -E "[A-Za-z]{2,10}-[0-9]+"; then
             echo "Jira key found in commit message."
           else
             echo "Commit message does not contain a valid Jira key."
