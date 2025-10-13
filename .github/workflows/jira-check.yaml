@@ -13,34 +13,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository with full history
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch all commits to check for Jira keys
+          fetch-depth: 0  # fetch all commit history
 
-      - name: Set target branch
+      - name: Validate Jira key in commits
         run: |
+          echo "🔍 Checking Jira issue key in commits..."
+
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            TARGET_BRANCH="${{ github.event.pull_request.base.ref }}"
+            BASE_SHA=${{ github.event.pull_request.base.sha }}
+            HEAD_SHA=${{ github.event.pull_request.head.sha }}
+            echo "Checking commits between $BASE_SHA and $HEAD_SHA (PR)..."
+            COMMITS=$(git log $BASE_SHA..$HEAD_SHA --pretty=format:"%s" --no-merges)
           else
-            TARGET_BRANCH="develop"
+            echo "Checking latest commits on 'develop'..."
+            COMMITS=$(git log -n 10 --pretty=format:"%s" --no-merges)
           fi
-          echo "TARGET_BRANCH=$TARGET_BRANCH" >> $GITHUB_ENV
 
-      - name: Get all commits in PR / push
-        run: |
-          echo "🔍 Checking for Jira issue key in all commits..."
-          
-          # Fetch the target branch to compare
-          git fetch origin $TARGET_BRANCH
-
-          # Get all commits not in the target branch, ignoring merge commits
-          COMMITS=$(git log origin/$TARGET_BRANCH..HEAD --pretty=format:"%s" --no-merges)
           echo "Commits to check:"
           echo "$COMMITS"
 
-          # Check if any commit contains a Jira key (format: ABC-123)
-          if ! echo "$COMMITS" | grep -Eq "[A-Z]{2,10}-[0-9]+"; then
-            echo "❌ Error: No valid Jira key found in any commit!"
+          if [ -z "$COMMITS" ]; then
+            echo "⚠️ No commits found to check!"
             exit 1
           fi
+
+          # Look for Jira key pattern (e.g., DP-1, ABC-23)
+          if ! echo "$COMMITS" | grep -Eq "[A-Z]{2,10}-[0-9]+"; then
+            echo "❌ Error: No valid Jira key found in any commit message!"
+            exit 1
+          fi
+
+          echo "✅ Jira key found in commit messages!"
