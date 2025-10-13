@@ -40,7 +40,7 @@ jobs:
           echo "$COMMITS"
 
           # Check if any commit contains a Jira key (format: ABC-123)
-          if ! echo "$COMMITS" | grep -Eq "[A-Z]{2,10}-[0-9]+'; then
+          if ! echo "$COMMITS" | grep -Eq "[A-Z]{2,10}-[0-9]+"; then
             echo "❌ Error: No valid Jira key found in any commit!"
             exit 1
           fi
