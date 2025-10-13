@@ -13,10 +13,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repository with full history
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # fetch all commit history
+          fetch-depth: 0  # important — fetch full commit history
+          ref: ${{ github.head_ref }}  # ensure we are on the source branch for PRs
 
       - name: Validate Jira key in commits
         run: |
@@ -40,7 +41,6 @@ jobs:
             exit 1
           fi
 
-          # Look for Jira key pattern (e.g., DP-1, ABC-23)
           if ! echo "$COMMITS" | grep -Eq "[A-Z]{2,10}-[0-9]+"; then
             echo "❌ Error: No valid Jira key found in any commit message!"
             exit 1
