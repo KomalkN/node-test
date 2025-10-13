@@ -13,19 +13,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+     # Code checkout
       - name: Checkout repository
         uses: actions/checkout@v4
-
+     # Test Jira Key
       - name: Get recent commit messages
         run: |
           echo "🔍 Checking for Jira issue key in commit messages..."
           COMMITS=$(git log -1 --pretty=%B)
           echo "$COMMITS"
 
-          # Regex to match Jira keys (e.g., DP-123)
+          # Regex to match Jira keys
           if echo "$COMMITS" | grep -E -q "DP-[0-9]+"; then
             echo "Jira key found in commit message."
           else
-            echo "❌ Commit message does not contain a valid Jira key (e.g., DP-123)."
+            echo "Commit message does not contain a valid Jira key."
             exit 1
           fi
