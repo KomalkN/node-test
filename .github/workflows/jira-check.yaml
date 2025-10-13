@@ -15,28 +15,35 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # fetch all commit history
 
-      - name: Get all commits in the PR
+      - name: Validate Jira key in commits
         run: |
-           echo "🔍 Checking for Jira issue key in all commits..."
-           COMMITS=$(git log origin/develop..HEAD --pretty=format:"%s")
-           echo "Commits:"
-           echo "$COMMITS"
-           if ! echo "$COMMITS" | grep -qE '[A-Z]+-[0-9]+'; then
-              echo "Error: No valid Jira key found in any commit!"
-              exit 1
-           fi
+          echo "🔍 Checking Jira issue key in commits..."
 
-      # - name: Validate Jira key in latest commit
-      #   run: |
-      #     echo "🔍 Checking for Jira issue key in the latest commit message..."
-      #     COMMIT_MSG=$(git log -1 --pretty=%B)
-      #     echo "Commit message: $COMMIT_MSG"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE_SHA=${{ github.event.pull_request.base.sha }}
+            HEAD_SHA=${{ github.event.pull_request.head.sha }}
+            echo "Checking commits between $BASE_SHA and $HEAD_SHA (PR)..."
+            COMMITS=$(git log $BASE_SHA..$HEAD_SHA --pretty=format:"%s" --no-merges)
+          else
+            echo "Checking latest commits on 'develop'..."
+            COMMITS=$(git log -n 10 --pretty=format:"%s" --no-merges)
+          fi
 
-      #     # Regex pattern for Jira issue key
-      #     if echo "$COMMIT_MSG" | grep -Eq "[A-Z]{2,10}-[0-9]+"; then
-      #       echo "Jira key found in commit message."
-      #     else
-      #       echo "Commit message does not contain a valid Jira key."
-      #       exit 1
-      #     fi
+          echo "Commits to check:"
+          echo "$COMMITS"
+
+          if [ -z "$COMMITS" ]; then
+            echo "⚠️ No commits found to check!"
+            exit 1
+          fi
+
+          # Look for Jira key pattern (e.g., DP-1, ABC-23)
+          if ! echo "$COMMITS" | grep -Eq "[A-Z]{2,10}-[0-9]+"; then
+            echo "❌ Error: No valid Jira key found in any commit message!"
+            exit 1
+          fi
+
+          echo "✅ Jira key found in commit messages!"
