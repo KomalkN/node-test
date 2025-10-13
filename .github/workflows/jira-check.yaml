@@ -24,8 +24,8 @@ jobs:
 
           # Regex pattern for Jira issue key
           if echo "$COMMIT_MSG" | grep -Eq "[A-Z]{2,10}-[0-9]+"; then
-            echo "Jira key found in commit message."
+            echo "✅ Jira key found in commit message."
           else
-            echo "Commit message does not contain a valid Jira key."
+            echo "❌ Commit message does not contain a valid Jira key."
             exit 1
           fi
