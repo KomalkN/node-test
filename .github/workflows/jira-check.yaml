@@ -22,10 +22,10 @@ jobs:
           COMMITS=$(git log -1 --pretty=%B)
           echo "$COMMITS"
 
-          # Regex to match Jira keys (e.g., DP-123)
+          # Regex to match Jira keys
           if echo "$COMMITS" | grep -E -q "DP-[0-9]+"; then
             echo "Jira key found in commit message."
           else
-            echo "❌ Commit message does not contain a valid Jira key (e.g., DP-123)."
+            echo "Commit message does not contain a valid Jira key."
             exit 1
           fi
