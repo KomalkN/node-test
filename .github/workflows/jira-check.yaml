@@ -1,0 +1,20 @@
+name: Validate Jira Ticket in Commit Messages
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [develop]
+
+jobs:
+  check-jira-ticket:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check commit messages for Jira ticket
+        run: |
+          if ! git log -1 --pretty=%B | grep -E "DEVOPS-[0-9]+"; then
+            echo "❌ No valid Jira ticket found in commit message."
+            exit 1
+          fi
