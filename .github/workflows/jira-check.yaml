@@ -13,19 +13,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repository with full history
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all commits to check for Jira keys
 
-      - name: Validate Jira key in latest commit
+      - name: Set target branch
         run: |
-          echo "🔍 Checking for Jira issue key in the latest commit message..."
-          COMMIT_MSG=$(git log -1 --pretty=%B)
-          echo "Commit message: $COMMIT_MSG"
-
-          # Regex pattern for Jira issue key
-          if echo "$COMMIT_MSG" | grep -Eq "[A-Z]{2,10}-[0-9]+"; then
-            echo "Jira key found in commit message."
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            TARGET_BRANCH="${{ github.event.pull_request.base.ref }}"
           else
-            echo "Commit message does not contain a valid Jira key."
+            TARGET_BRANCH="develop"
+          fi
+          echo "TARGET_BRANCH=$TARGET_BRANCH" >> $GITHUB_ENV
+
+      - name: Get all commits in PR / push
+        run: |
+          echo "🔍 Checking for Jira issue key in all commits..."
+          
+          # Fetch the target branch to compare
+          git fetch origin $TARGET_BRANCH
+
+          # Get all commits not in the target branch, ignoring merge commits
+          COMMITS=$(git log origin/$TARGET_BRANCH..HEAD --pretty=format:"%s" --no-merges)
+          echo "Commits to check:"
+          echo "$COMMITS"
+
+          # Check if any commit contains a Jira key (format: ABC-123)
+          if ! echo "$COMMITS" | grep -Eq "[A-Z]{2,10}-[0-9]+'; then
+            echo "❌ Error: No valid Jira key found in any commit!"
             exit 1
           fi
