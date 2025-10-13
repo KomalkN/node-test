@@ -3,7 +3,6 @@ name: Deploy for test
 on:
   push:
     branches:
-      - test-no-key
       - develop
 
 jobs:
