@@ -16,16 +16,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Validate Jira key in latest commit
+      - name: Get all commits in the PR
         run: |
-          echo "🔍 Checking for Jira issue key in the latest commit message..."
-          COMMIT_MSG=$(git log -1 --pretty=%B)
-          echo "Commit message: $COMMIT_MSG"
+           echo "🔍 Checking for Jira issue key in all commits..."
+           COMMITS=$(git log origin/develop..HEAD --pretty=format:"%s")
+           echo "Commits:"
+           echo "$COMMITS"
+           if ! echo "$COMMITS" | grep -qE '[A-Z]+-[0-9]+'; then
+              echo "Error: No valid Jira key found in any commit!"
+              exit 1
+           fi
 
-          # Regex pattern for Jira issue key
-          if echo "$COMMIT_MSG" | grep -Eq "[A-Z]{2,10}-[0-9]+"; then
-            echo "Jira key found in commit message."
-          else
-            echo "Commit message does not contain a valid Jira key."
-            exit 1
-          fi
+      # - name: Validate Jira key in latest commit
+      #   run: |
+      #     echo "🔍 Checking for Jira issue key in the latest commit message..."
+      #     COMMIT_MSG=$(git log -1 --pretty=%B)
+      #     echo "Commit message: $COMMIT_MSG"
+
+      #     # Regex pattern for Jira issue key
+      #     if echo "$COMMIT_MSG" | grep -Eq "[A-Z]{2,10}-[0-9]+"; then
+      #       echo "Jira key found in commit message."
+      #     else
+      #       echo "Commit message does not contain a valid Jira key."
+      #       exit 1
+      #     fi
