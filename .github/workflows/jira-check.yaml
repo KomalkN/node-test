@@ -40,6 +40,6 @@ jobs:
             echo "✅ Jira key found in commit message!"
           else
             echo "❌ Error: Commit message missing Jira key!"
-            echo "🔒 Please include a Jira key like DP-1 in your commit message."
+            echo "🔒 Please include a Jira key in your commit message."
             exit 1
           fi
