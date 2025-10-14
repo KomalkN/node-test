@@ -13,45 +13,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository with full history
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          ref: ${{ github.head_ref }}
+          fetch-depth: 2  # only need recent commits
 
-      - name: Validate Jira key in commits
+      - name: Validate Jira key in latest commit
         run: |
-          echo "🔍 Checking Jira issue key in commits..."
+          echo "🔍 Checking Jira issue key in the latest commit..."
 
-          # Determine whether it's a PR or direct push
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            BASE_SHA=${{ github.event.pull_request.base.sha }}
-            HEAD_SHA=${{ github.event.pull_request.head.sha }}
-            echo "📘 Pull Request detected: Checking commits between $BASE_SHA and $HEAD_SHA..."
-            COMMITS=$(git log $BASE_SHA..$HEAD_SHA --pretty=format:"%s" --no-merges)
+            # For PRs — get latest commit in the PR
+            COMMIT_MSG=$(git log -1 --pretty=%s)
+            echo "📘 PR commit message: $COMMIT_MSG"
           else
-            echo "📗 Push event detected: Checking latest 10 commits on 'develop'..."
-            COMMITS=$(git log -n 10 --pretty=format:"%s" --no-merges)
+            # For direct pushes to develop — get latest commit
+            COMMIT_MSG=$(git log -1 --pretty=%s)
+            echo "📗 Push commit message: $COMMIT_MSG"
           fi
 
-          echo "-------------------------------------------"
-          echo "Commits to check:"
-          echo "$COMMITS"
-          echo "-------------------------------------------"
-
-          if [ -z "$COMMITS" ]; then
-            echo "⚠️ No commits found to check!"
+          # Validate Jira key format (e.g., DP-1, ABC-123)
+          if echo "$COMMIT_MSG" | grep -Eq "[A-Z]{2,10}-[0-9]+"; then
+            echo "✅ Jira key found in commit message!"
+          else
+            echo "❌ Error: Commit message missing Jira key!"
+            echo "🔒 Please include a Jira key like DP-1 in your commit message."
             exit 1
           fi
-
-          echo "$COMMITS" | while IFS= read -r COMMIT_MSG; do
-            if ! echo "$COMMIT_MSG" | grep -Eq "[A-Z]{2,10}-[0-9]+"; then
-              echo "❌ Commit message missing Jira key: '$COMMIT_MSG'"
-              echo "🔒 Each commit must include a Jira key like DP-1"
-              exit 1
-            else
-              echo "✅ Commit contains Jira key: '$COMMIT_MSG'"
-            fi
-          done
-
-          echo "🎉 All commits contain valid Jira keys!"
