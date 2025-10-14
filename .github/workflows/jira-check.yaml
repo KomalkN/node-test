@@ -16,23 +16,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2  # only need recent commits
+          fetch-depth: 0
 
       - name: Validate Jira key in latest commit
         run: |
           echo "🔍 Checking Jira issue key in the latest commit..."
 
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            # For PRs — get latest commit in the PR
+            echo "📘 Pull request detected — fetching PR commits..."
+            # Fetch and switch to the PR head commit
+            git fetch origin ${{ github.event.pull_request.head.ref }} --depth=1
+            git checkout FETCH_HEAD
             COMMIT_MSG=$(git log -1 --pretty=%s)
-            echo "📘 PR commit message: $COMMIT_MSG"
           else
-            # For direct pushes to develop — get latest commit
+            echo "📗 Push event detected — checking latest commit on 'develop'..."
             COMMIT_MSG=$(git log -1 --pretty=%s)
-            echo "📗 Push commit message: $COMMIT_MSG"
           fi
 
-          # Validate Jira key format (e.g., DP-1, ABC-123)
+          echo "Commit message: $COMMIT_MSG"
+
+          # Validate Jira key format
           if echo "$COMMIT_MSG" | grep -Eq "[A-Z]{2,10}-[0-9]+"; then
             echo "✅ Jira key found in commit message!"
           else
