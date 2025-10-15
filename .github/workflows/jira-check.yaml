@@ -20,16 +20,16 @@ jobs:
 
       - name: Validate Jira key in latest commit
         run: |
-          echo "🔍 Checking Jira issue key in the latest commit..."
+          echo "Checking Jira issue key in the latest commit..."
 
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            echo "📘 Pull request detected — fetching PR commits..."
+            echo "Pull request detected — fetching PR commits..."
             # Fetch and switch to the PR head commit
             git fetch origin ${{ github.event.pull_request.head.ref }} --depth=1
             git checkout FETCH_HEAD
             COMMIT_MSG=$(git log -1 --pretty=%s)
           else
-            echo "📗 Push event detected — checking latest commit on 'develop'..."
+            echo "Push event detected — checking latest commit on 'develop'..."
             COMMIT_MSG=$(git log -1 --pretty=%s)
           fi
 
@@ -37,9 +37,9 @@ jobs:
 
           # Validate Jira key format
           if echo "$COMMIT_MSG" | grep -Eq "[A-Z]{2,10}-[0-9]+"; then
-            echo "✅ Jira key found in commit message!"
+            echo "Jira key found in commit message!"
           else
-            echo "❌ Error: Commit message missing Jira key!"
-            echo "🔒 Please include a Jira key like DP-1 in your commit message."
+            echo "Error: Commit message missing Jira key!"
+            echo "Please include a Jira key like DP-1 in your commit message."
             exit 1
           fi
