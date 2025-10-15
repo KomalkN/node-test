@@ -2,11 +2,11 @@ name: Jira Key Validation
 
 on:
   workflow_call:
-    inputs:
-      branch:
-        description: "Branch to validate Jira key against"
-        required: true
-        type: string
+    # inputs:
+    #   branch:
+    #     description: "Branch to validate Jira key against"
+    #     required: true
+    #     type: string
 
 jobs:
   validate-jira-key:
@@ -20,15 +20,22 @@ jobs:
 
       - name: Validate Jira key in latest commit
         run: |
-          echo "Checking Jira issue key in the latest commit on branch: ${{ inputs.branch }}"
+          echo "Checking Jira issue key in the latest commit..."
 
-          git fetch origin ${{ inputs.branch }} --depth=1
-          git checkout FETCH_HEAD
-          COMMIT_MSG=$(git log -1 --pretty=%s)
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "Pull request detected — fetching PR commits..."
+            # Fetch and switch to the PR head commit
+            git fetch origin ${{ github.event.pull_request.head.ref }} --depth=1
+            git checkout FETCH_HEAD
+            COMMIT_MSG=$(git log -1 --pretty=%s)
+          else
+            echo "Push event detected — checking latest commit on 'develop'..."
+            COMMIT_MSG=$(git log -1 --pretty=%s)
+          fi
 
           echo "Commit message: $COMMIT_MSG"
 
-          # Validate Jira key format (e.g., DP-1, ABC-123)
+          # Validate Jira key format
           if echo "$COMMIT_MSG" | grep -Eq "[A-Z]{2,10}-[0-9]+"; then
             echo "Jira key found in commit message!"
           else

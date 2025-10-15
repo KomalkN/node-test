@@ -13,4 +13,3 @@ jobs:
     uses: ./.github/workflows/jira-key-check.yaml
     with:
       branch: develop
-
