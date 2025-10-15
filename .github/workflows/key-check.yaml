@@ -1,0 +1,15 @@
+name: Call Jira Key Validation
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  call-jira-validation:
+    uses: ./.github/workflows/jira-key.yaml
+    with:
+      branch: develop
