@@ -3,10 +3,10 @@ name: Jira Key Validation
 on:
   push:
     branches:
-      - develop
+      - develo
   pull_request:
     branches:
-      - develop
+      - develo
 
 jobs:
   validate-jira-key:
