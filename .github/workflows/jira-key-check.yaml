@@ -6,13 +6,11 @@ on:
 jobs:
   validate-jira-key:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Validate Jira key in latest commit
         run: |
           echo "Checking Jira issue key in the latest commit..."
