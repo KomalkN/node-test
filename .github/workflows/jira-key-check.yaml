@@ -2,11 +2,6 @@ name: Jira Key Validation
 
 on:
   workflow_call:
-    # inputs:
-    #   branch:
-    #     description: "Branch to validate Jira key against"
-    #     required: true
-    #     type: string
 
 jobs:
   validate-jira-key:
