@@ -11,5 +11,3 @@ on:
 jobs:
   call-jira-validation:
     uses: ./.github/workflows/jira-key-check.yaml
-    with:
-      branch: develop
