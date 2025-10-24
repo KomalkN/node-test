@@ -1,0 +1,48 @@
+name: Jira Key Validation
+
+on:
+  workflow_call:
+    inputs:
+      allowed_prefixes:
+        description: "Comma-separated list of allowed Jira key prefixes"
+        required: true
+        type: string
+
+jobs:
+  validate-jira-key:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate Jira key in latest commit
+        run: |
+          echo "Checking Jira issue key in the latest commit..."
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "Pull request detected — fetching PR commits..."
+            git fetch origin ${{ github.event.pull_request.head.ref }} --depth=1
+            git checkout FETCH_HEAD
+            COMMIT_MSG=$(git log -1 --pretty=%s)
+          else
+            echo "Push event detected — checking latest commit..."
+            COMMIT_MSG=$(git log -1 --pretty=%s)
+          fi
+
+          echo "Commit message: $COMMIT_MSG"
+          echo "Allowed prefixes: ${{ inputs.allowed_prefixes }}"
+
+          # Convert comma-separated prefixes into regex pattern
+          ALLOWED_PATTERN=$(echo "${{ inputs.allowed_prefixes }}" | sed 's/,/|/g')
+
+          echo "Generated regex pattern: ^(${ALLOWED_PATTERN})-[0-9]+"
+
+          if echo "$COMMIT_MSG" | grep -Eq "(${ALLOWED_PATTERN})-[0-9]+"; then
+            echo "Valid Jira key found!"
+          else
+            echo "Error: Commit message must include a valid Jira key prefix from (${{ inputs.allowed_prefixes }})"
+            exit 1
+          fi
