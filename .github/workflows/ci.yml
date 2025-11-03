@@ -1,9 +1,10 @@
-name: Deploy to GCP VM
+name: Deploy node
 
 on:
   push:
     branches:
       - main  # Change this to your main branch name
+      - develop
 
 jobs:
   deploy:
@@ -12,8 +13,6 @@ jobs:
     steps:                                          
       - name: Checkout code #checkout repository     #STEP 1
         uses: actions/checkout@v2
-
-
 
       # - name: Setup Node.js                          #STEP 2
       #   uses: actions/setup-node@v3
