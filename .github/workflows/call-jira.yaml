@@ -1,0 +1,21 @@
+name: Jira Key Validation
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read
+
+# Defining the event that triggers this workflow.
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+
+# Defining the jobs to be executed in the workflow.
+jobs:
+  call-jira-validation:
+    uses: .github/workflows/jira-key-Validation.yaml@main
+    with:
+      allowed_prefixes: "DP,KOM"
