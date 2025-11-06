@@ -36,3 +36,9 @@ jobs:
         run: |
           docker build -t env-test:latest .
           echo "Docker build completed successfully!"
+      # Check what files are inside the built image
+      - name: Inspect image contents
+        run: |
+          echo "===== Files inside container ====="
+          docker run --rm env-test:latest ls -la
+          echo "=================================="
