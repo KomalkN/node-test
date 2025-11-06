@@ -28,10 +28,6 @@ jobs:
         run: |
           echo "===== Files in build context ====="
           ls -la
-      # .env content printed
-      - name: Print .env inside container
-        run: |
-           docker run --rm env-test:latest sh -c "echo '=== .env content ==='; cat .env || echo 'No .env found'; echo '======================='"
       # Build Docker image (local only)
       - name: Build Docker Image
         run: |
@@ -43,3 +39,7 @@ jobs:
           echo "===== Files inside container ====="
           docker run --rm env-test:latest ls -la
           echo "=================================="
+      # .env content printed
+      - name: Print .env inside container
+        run: |
+           docker run --rm env-test:latest sh -c "echo '=== .env content ==='; cat .env || echo 'No .env found'; echo '======================='"
