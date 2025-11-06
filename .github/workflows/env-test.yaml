@@ -1,0 +1,38 @@
+name: Docker ENV Test
+
+on:
+  push:
+    branches:
+      - develop
+      - docker-env-test
+
+jobs:
+  docker-env-test:
+    name: "Test .env Injection and Docker Build"
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout your repo
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Create .env file from secret
+      - name: Inject ENV file
+        run: |
+          echo "${{ secrets.ENV }}" > .env
+          echo " .env file created successfully!"
+          echo
+          echo "Contents of .env file:"
+          cat .env
+
+      # 3. (Optional) Show build context
+      - name: Show Files Included Before Docker Build
+        run: |
+          echo "===== Files in build context ====="
+          ls -la
+
+      # 4. Build Docker image (local only)
+      - name: Build Docker Image
+        run: |
+          docker build -t env-test:latest .
+          echo "Docker build completed successfully!"
