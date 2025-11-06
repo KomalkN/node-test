@@ -11,6 +11,6 @@ COPY . .
 # Expose the port your app runs on (default 3000)
 EXPOSE 3000
 # Run the app
-# CMD ["npm", "start"]
+CMD ["npm", "start"]
 # Optional — If you only want to test .env content printed
-CMD ["sh", "-c", "echo 'Container running...'; echo 'Env content:'; cat .env"]
+# CMD ["sh", "-c", "echo 'Container running...'; echo 'Env content:'; cat .env"]

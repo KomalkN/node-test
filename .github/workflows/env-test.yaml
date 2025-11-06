@@ -12,11 +12,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout your repo
+      # Checkout your repo
       - name: Checkout Code
         uses: actions/checkout@v4
-
-      # 2. Create .env file from secret
+      # Create .env file from secret
       - name: Inject ENV file
         run: |
           echo "${{ secrets.ENV }}" > .env
@@ -24,14 +23,16 @@ jobs:
           echo
           echo "Contents of .env file:"
           cat .env
-
-      # 3. (Optional) Show build context
+      # Show build context
       - name: Show Files Included Before Docker Build
         run: |
           echo "===== Files in build context ====="
           ls -la
-
-      # 4. Build Docker image (local only)
+      # .env content printed
+      - name: Print .env inside container
+        run: |
+           docker run --rm env-test:latest sh -c "echo '=== .env content ==='; cat .env || echo 'No .env found'; echo '======================='"
+      # Build Docker image (local only)
       - name: Build Docker Image
         run: |
           docker build -t env-test:latest .
