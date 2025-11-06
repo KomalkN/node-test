@@ -1,0 +1,37 @@
+name: Test Dockerignore
+
+# Defining the event that triggers this workflow.
+on:
+  push:
+    branches:
+      - develop
+      - dockerignore
+
+jobs:
+  test-dockerignore:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Print files BEFORE docker build
+      - name: List repo files
+        run: |
+          echo "===== Files in repo before docker build ====="
+          ls -la
+          echo "============================================"
+
+      # Build Docker image (no push)
+      - name: Build Docker image
+        run: |
+          echo "===== Building Docker image ====="
+          docker build -t test-ignore . --progress=plain
+          echo "===== Build complete ====="
+
+      # Check what files are inside the built image
+      - name: Inspect image contents
+        run: |
+          echo "===== Files inside container ====="
+          docker run --rm test-ignore ls -la
+          echo "=================================="
