@@ -42,4 +42,4 @@ jobs:
       # .env content printed
       - name: Print .env inside container
         run: |
-           docker run --rm env-test:latest sh -c "echo '=== .env content ==='; cat .env || echo 'No .env found'; echo '======================='"
+           docker run --rm env-test:latest sh -c "echo '=== .env keys ==='; awk -F= '{print $1}' .env; echo '==================='"
